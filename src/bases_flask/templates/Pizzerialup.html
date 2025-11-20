@@ -1,0 +1,182 @@
+   {% extends "layout.html" %}
+   {% import "_macros.html" as datos_macro %}
+            {% block container %}
+<style>
+    body {
+        background-color: #769c6a;
+    }
+    .caja-formulario {
+        background-color: #a2a3a6;
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+    .caja-tabla {
+        padding: 15px;
+
+        min-height: 250px;
+    }
+    .caja-ventas {
+        padding: 20px;
+
+        min-height: 300px;
+    }
+    .tabla-pedidos {
+        background-color: white;
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+    }
+    .tabla-pedidos th, .tabla-pedidos td {
+        padding: 8px;
+        text-align: center;
+    }
+    .tabla-pedidos th {
+        font-weight: normal;
+    }
+    .campo-form {
+        margin-bottom: 10px;
+    }
+    .campo-form label {
+        display: inline-block;
+        width: 100px;
+        font-weight: normal;
+    }
+    .campo-form input[type="text"] {
+        width: 150px;
+        padding: 3px;
+    }
+    .campo-form input[type="checkbox"] {
+        margin-right: 5px;
+    }
+    .grupo-ingredientes {
+        display: inline-block;
+        vertical-align: top;
+    }
+    .grupo-ingredientes label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .boton {
+        padding: 5px 20px;
+        cursor: pointer;
+        margin: 5px;
+    }
+    .opciones-radio label {
+        display: block;
+        margin-bottom: 5px;
+    }
+</style>
+
+<div class="contenedor-principal">
+    <h4 style="text-align: center; margin-bottom: 20px;">ExamenPizzas</h4>
+    
+    {% if mensaje %}
+    <div style="background-color: #bde6bd; padding: 15px; margin-bottom: 20px; border: 2px solid #5A6A7A; text-align: center;">
+        <h4>{{mensaje}}</h4>
+    </div>
+    {% endif %}
+    
+    <form action="" method="post" novalidate>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="caja-formulario">
+                    <div class="campo-form">
+                        <label>Nombre:</label>
+                        <input type="text" name="nombre_cliente" value="{{nombre_cli}}" required>
+                    </div>
+                    <div class="campo-form">
+                        <label>Direccion:</label>
+                        <input type="text" name="direccion" value="{{direccion_cli}}" required>
+                    </div>
+                    <div class="campo-form">
+                        <label>Telefono:</label>
+                        <input type="text" name="telefono" value="{{telefono_cli}}" required>
+                    </div>
+                    
+                    <div class="campo-form">
+                        <label style="vertical-align: top;">Tamaño Pizza:</label>
+                        <div style="display: inline-block;">
+                            <div class="opciones-radio">
+                                <label><input type="radio" name="tamano" value="Chica" required> Chica $40</label>
+                                <label><input type="radio" name="tamano" value="Mediana"> Mediana $80</label>
+                                <label><input type="radio" name="tamano" value="Grande"> Grande $120</label>
+                            </div>
+                        </div>
+                        
+                        <div class="grupo-ingredientes" style="margin-left: 50px;">
+                            <label style="width: auto; font-weight: normal;">Ingredientes</label>
+                            <label><input type="checkbox" name="ing_jamon" value="Jamon"> Jamon $10</label>
+                            <label><input type="checkbox" name="ing_pina" value="Piña"> Piña $10</label>
+                            <label><input type="checkbox" name="ing_champinones" value="Champiñones"> Champiñones $10</label>
+                        </div>
+                        
+                        <div style="display: inline-block; margin-left: 30px; vertical-align: top;">
+                            <label style="width: auto;">Num. de Pizzas:</label><br>
+                            <input type="number" name="numero_pizzas" style="width: 80px;" min="1" value="1" required>
+                            <br><br>
+                            <button type="submit" name="btnAgregar" value="agregar" class="boton">Agregar</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="caja-tabla">
+                    <table class="tabla-pedidos">
+                        <thead>
+                            <tr>
+                                <th>Tamaño</th>
+                                <th>Ingredientes</th>
+                                <th>Num. Pizzas</th>
+                                <th>SubTotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if pizzas %}
+                            {% for pizza in pizzas %}
+                            <tr>
+                                <td>{{pizza.tamano}}</td>
+                                <td>{{pizza.ingredientes}}</td>
+                                <td>{{pizza.numero_pizzas}}</td>
+                                <td>${{pizza.subtotal}}</td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="4" style="height: 100px;"></td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    
+                    <button type="submit" name="btnQuitar" value="quitar" class="boton">Quitar</button>
+                    <button type="submit" name="btnTerminar" value="terminar" class="boton" style="margin-left: 100px;">Terminar</button>
+                </div>
+            </div>
+            
+                        <div class="col-md-5">
+                <div class="caja-ventas">
+                    <h5 style="text-align: center; margin-bottom: 20px;">Ventas del dia</h5>
+                    <div>
+                        {% if mostrar_ventas and ventas %}
+                        {% set suma_total = 0 %}
+                        {% for venta in ventas %}
+                        <p style="margin: 10px 0;"><strong>{{venta.nombre}}</strong> total <strong>${{venta.total}}</strong></p>
+                        {% set suma_total = suma_total + venta.total %}
+                        {% endfor %}
+                        <br>
+                        <tr>
+                    <td colspan="4" style="text-align: right;"><strong>TOTAL GENERAL:</strong></td>
+                    <td><strong>${{ventas|sum(attribute='total')}}</strong></td>
+                </tr>
+                        {% endif %}
+                    </div>
+                    <button type="submit" name="btnVentas" value="ventas" class="boton" style="margin-top: 20px;">Ventas totales por dia</button>
+                </div>
+            </div>
+        </div>
+    </form>
+     
+   
+</div>
+
+
+{% endblock %}
